@@ -20,6 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Expenses
     Route::resource('expenses', ExpenseController::class);
+    Route::get('/summary', [DashboardController::class, 'summary'])->name('summary');
 
 });
 

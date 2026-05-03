@@ -34,4 +34,45 @@ class DashboardController extends Controller
             'recentExpenses'
         ));
     }
+    public function summary()
+{
+    $userId = auth()->id();
+
+    $totalIncome = Expense::forUser($userId)
+        ->ofType('income')
+        ->sum('amount');
+
+    $totalExpense = Expense::forUser($userId)
+        ->ofType('expense')
+        ->sum('amount');
+
+    $balance = $totalIncome - $totalExpense;
+
+    // Category breakdown for pie chart
+    $categoryData = Expense::forUser($userId)
+        ->ofType('expense')
+        ->with('category')
+        ->selectRaw('category_id, SUM(amount) as total')
+        ->groupBy('category_id')
+        ->get();
+
+    // Monthly trend for bar chart
+    $monthlyData = Expense::forUser($userId)
+        ->selectRaw('MONTH(expense_date) as month,
+                     YEAR(expense_date) as year,
+                     type,
+                     SUM(amount) as total')
+        ->groupBy('year', 'month', 'type')
+        ->orderBy('year')
+        ->orderBy('month')
+        ->get();
+
+    return view('summary', compact(
+        'totalIncome',
+        'totalExpense',
+        'balance',
+        'categoryData',
+        'monthlyData'
+    ));
+}
 }

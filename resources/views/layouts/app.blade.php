@@ -20,6 +20,8 @@
                    class="hover:underline">Dashboard</a>
                 <a href="{{ route('expenses.index') }}"
                    class="hover:underline">Expenses</a>
+                <a href="{{ route('summary') }}"
+                   class="hover:underline">Summary</a>
                 @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}"
                        class="hover:underline">Admin</a>
