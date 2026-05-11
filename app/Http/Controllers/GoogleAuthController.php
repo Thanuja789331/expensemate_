@@ -15,59 +15,55 @@ class GoogleAuthController extends Controller
     }
 
     // Handle Google callback
-    public function callback()
-    {
-        try {
-            $googleUser = Socialite::driver('google')
-                ->stateless()
-                ->user();
+   public function callback()
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
 
-            // Check if user exists
-            $user = User::where('email', $googleUser->email)
-                ->first();
+        $user = User::where('email', '=', $googleUser->email)
+        ->first();
 
-            if ($user) {
-                // User exists - check if active
-                if (!$user->is_active) {
-                    return redirect()->route('login')
-                        ->withErrors([
-                            'email' => 'Your account has
-                                        been deactivated.'
-                        ]);
-                }
-
-                // Update google info
-                $user->update([
-                    'email_verified_at' => $user->email_verified_at
-                        ?? now(),
-                ]);
-
-                Auth::login($user);
-
-            } else {
-                // Create new user from Google
-                $user = User::create([
-                    'name'              => $googleUser->name,
-                    'email'             => $googleUser->email,
-                    'password'          => bcrypt(Str::random(16)),
-                    'role'              => 'user',
-                    'is_active'         => true,
-                    'email_verified_at' => now(),
-                ]);
-
-                Auth::login($user);
+        if ($user) {
+            if (!$user->is_active) {
+                return redirect()->route('login')
+                    ->withErrors([
+                        'email' => 'Your account has been deactivated.'
+                    ]);
             }
 
-            return redirect()->route('dashboard')
-                ->with('success',
-                    'Welcome ' . $user->name . '! 👋');
+            $user->update([
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ]);
 
-        } catch (\Exception $e) {
-            return redirect()->route('login')
-                ->withErrors([
-                    'email' => 'Google login failed.
-                                Please try again.'
-                ]);
+            Auth::login($user);
+
+        } else {
+            $user = User::create([
+                'name'              => $googleUser->name,
+                'email'             => $googleUser->email,
+                'password'          => bcrypt(Str::random(16)),
+                'role'              => 'user',
+                'is_active'         => true,
+                'email_verified_at' => now(),
+            ]);
+
+            Auth::login($user);
         }
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Welcome ' . $user->name . '! 👋');
+
+    } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+        return redirect()->route('login')
+            ->withErrors([
+                'email' => 'Google login cancelled. Please try again.'
+            ]);
+
+    } catch (\Exception $e) {
+        return redirect()->route('login')
+            ->withErrors([
+                'email' => 'Google login failed. Please try again.'
+            ]);
     }
+}
 }
