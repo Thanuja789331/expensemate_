@@ -1,37 +1,52 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CategoryManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 
-// Public home page
+// ── PUBLIC ROUTES ─────────────────────────────────────────
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Authenticated user routes
+// ── AUTHENTICATED USER ROUTES ─────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
-    // Expenses
+    // Summary
+    Route::get('/summary', [DashboardController::class, 'summary'])
+        ->name('summary');
+
+    // Expenses CRUD
     Route::resource('expenses', ExpenseController::class);
-    Route::get('/summary', [DashboardController::class, 'summary'])->name('summary');
+
+    // 2FA Routes
+    Route::get('/2fa/enable', [TwoFactorController::class, 'enable'])
+        ->name('2fa.enable');
+    Route::post('/2fa/confirm', [TwoFactorController::class, 'confirm'])
+        ->name('2fa.confirm');
+    Route::post('/2fa/disable', [TwoFactorController::class, 'disable'])
+        ->name('2fa.disable');
 
 });
 
-// Admin only routes
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+// ── ADMIN ONLY ROUTES ─────────────────────────────────────
+Route::middleware(['auth', 'verified', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    // Admin dashboard
+    // Admin Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])
         ->name('dashboard');
 
-    // Category management
+    // Category Management
     Route::get('/categories', [CategoryManagementController::class, 'index'])
         ->name('categories.index');
     Route::post('/categories', [CategoryManagementController::class, 'store'])
@@ -41,7 +56,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::delete('/categories/{category}', [CategoryManagementController::class, 'destroy'])
         ->name('categories.destroy');
 
-    // User management
+    // User Management
     Route::get('/users', [UserManagementController::class, 'index'])
         ->name('users.index');
     Route::patch('/users/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
