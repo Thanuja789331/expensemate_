@@ -1,8 +1,8 @@
 <div>
     {{-- Success Message --}}
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-800
-                    px-4 py-3 rounded mb-4">
+        <div class="bg-green-100 border border-green-400
+                    text-green-800 px-4 py-3 rounded mb-4">
             ✅ {{ session('success') }}
         </div>
     @endif
@@ -25,7 +25,8 @@
     {{-- Add New Button --}}
     <button wire:click="$set('showForm', true)"
             class="bg-green-700 text-white px-6 py-2
-                   rounded-lg mb-4 hover:bg-green-800 w-full md:w-auto">
+                   rounded-lg mb-4 hover:bg-green-800
+                   w-full md:w-auto">
         + Add New Entry
     </button>
 
@@ -51,13 +52,17 @@
                     <option value="income">Income</option>
                 </select>
                 @error('type')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
 
             {{-- Category --}}
             <div>
-                <label class="block text-gray-600 mb-1">Category</label>
+                <label class="block text-gray-600 mb-1">
+                    Category
+                </label>
                 <select wire:model="category_id"
                         class="w-full border rounded-lg px-3 py-2
                                focus:outline-none focus:ring-2
@@ -70,13 +75,17 @@
                     @endforeach
                 </select>
                 @error('category_id')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
 
             {{-- Amount --}}
             <div>
-                <label class="block text-gray-600 mb-1">Amount ($)</label>
+                <label class="block text-gray-600 mb-1">
+                    Amount ($)
+                </label>
                 <input wire:model.live="amount"
                        type="number"
                        step="0.01"
@@ -86,7 +95,9 @@
                               focus:ring-green-500"
                        placeholder="0.00" />
                 @error('amount')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
 
@@ -101,7 +112,9 @@
                               focus:outline-none focus:ring-2
                               focus:ring-green-500" />
                 @error('expense_date')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
 
@@ -117,7 +130,9 @@
                               focus:ring-green-500"
                        placeholder="Describe this transaction" />
                 @error('note')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ $message }}
+                    </p>
                 @enderror
             </div>
 
@@ -128,7 +143,8 @@
             <button wire:click="saveExpense"
                     wire:loading.attr="disabled"
                     class="bg-green-700 text-white px-6 py-2
-                           rounded-lg hover:bg-green-800 w-full md:w-auto">
+                           rounded-lg hover:bg-green-800
+                           w-full md:w-auto">
                 <span wire:loading.remove>
                     {{ $editingId ? 'Save Changes' : 'Confirm Entry' }}
                 </span>
@@ -136,7 +152,8 @@
             </button>
             <button wire:click="resetForm"
                     class="bg-gray-300 text-gray-700 px-6 py-2
-                           rounded-lg hover:bg-gray-400 w-full md:w-auto">
+                           rounded-lg hover:bg-gray-400
+                           w-full md:w-auto">
                 Cancel
             </button>
         </div>
@@ -145,8 +162,6 @@
 
     {{-- Expenses Table --}}
     <div class="bg-white rounded-xl shadow overflow-hidden">
-
-        {{-- Scrollable on mobile --}}
         <div class="overflow-x-auto">
             <table class="w-full text-left min-w-[600px]">
                 <thead class="bg-green-700 text-white">
@@ -187,25 +202,42 @@
                             {{ $expense->note ?? '---' }}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <button wire:click="editExpense({{ $expense->id }})"
-                                    class="bg-blue-500 text-white px-3 py-1
-                                           rounded text-sm mr-1">
-                                Edit
+                            <button
+                                wire:click="editExpense({{ $expense->id }})"
+                                class="bg-blue-500 text-white px-3 py-1
+                                       rounded text-sm mr-1">
+                                ✏️ Edit
                             </button>
                             <button
                                 wire:click="deleteExpense({{ $expense->id }})"
                                 wire:confirm="Delete this expense?"
                                 class="bg-red-500 text-white px-3 py-1
                                        rounded text-sm">
-                                Delete
+                                🗑️ Delete
                             </button>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6"
-                            class="text-center py-8 text-gray-400">
-                            No expenses found.
+                        <td colspan="6" class="text-center py-12">
+                            <img src="{{ asset('images/empty.svg') }}"
+                                 alt="No expenses"
+                                 class="w-48 h-48 mx-auto mb-4
+                                        opacity-80" />
+                            <p class="text-gray-600 text-xl
+                                      font-bold mb-2">
+                                No Expenses Found!
+                            </p>
+                            <p class="text-gray-400 text-sm mb-6">
+                                Start tracking your spending today
+                            </p>
+                            <button
+                                wire:click="$set('showForm', true)"
+                                class="bg-green-700 text-white px-8 py-3
+                                       rounded-lg hover:bg-green-800
+                                       font-medium">
+                                + Add First Expense
+                            </button>
                         </td>
                     </tr>
                     @endforelse
