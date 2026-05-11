@@ -1,191 +1,120 @@
 <?php
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Expense;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ExpenseController extends Controller
 {
-    // Get all expenses
-    public function index(Request $request)
+    // Show all expenses
+    public function index()
     {
-        try {
-            $expenses = Expense::forUser($request->user()->id)
-                ->with('category')
-                ->when($request->type, fn($q) =>
-                    $q->ofType($request->type))
-                ->when($request->from, fn($q) =>
-                    $q->whereBetween('expense_date',
-                        [$request->from, $request->to ?? now()]))
-                ->when($request->category_id, fn($q) =>
-                    $q->where('category_id', $request->category_id))
-                ->latest('expense_date')
-                ->paginate($request->per_page ?? 20);
+        $expenses = Expense::forUser(auth()->id())
+            ->with('category')
+            ->latest('expense_date')
+            ->paginate(15);
 
-            return response()->json([
-                'success' => true,
-                'data'    => $expenses,
-                'message' => 'Expenses retrieved successfully.'
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve expenses.',
-                'error'   => $e->getMessage()
-            ], 500);
-        }
+        return view('expenses.index', compact('expenses'));
     }
 
-    // Create new expense
+    // Show create form
+    public function create()
+    {
+        $categories = Category::active()->get();
+        return view('expenses.create', compact('categories'));
+    }
+
+    // Save new expense
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'type'         => 'required|in:income,expense',
-                'category_id'  => 'required|exists:categories,id',
-                'amount'       => 'required|numeric|min:0.01|max:9999999',
-                'note'         => 'nullable|string|max:500',
-                'expense_date' => 'required|date|before_or_equal:today',
-            ]);
+        $validated = $request->validate([
+            'type'         => 'required|in:income,expense',
+            'category_id'  => 'required|exists:categories,id',
+            'amount'       => 'required|numeric|min:0.01|max:9999999',
+            'note'         => 'nullable|string|max:500',
+            'expense_date' => 'required|date|before_or_equal:today',
+        ]);
 
-            $expense = Expense::create([
-                'user_id'      => $request->user()->id,
-                'type'         => $validated['type'],
-                'category_id'  => $validated['category_id'],
-                'amount'       => $validated['amount'],
-                'note'         => $validated['note'] ?? null,
-                'expense_date' => $validated['expense_date'],
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Expense created successfully.',
-                'expense' => $expense->load('category'),
-            ], 201);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors'  => $e->errors()
-            ], 422);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create expense.',
-                'error'   => $e->getMessage()
-            ], 500);
+        // Sanitize note field
+        if (isset($validated['note'])) {
+            $validated['note'] = strip_tags($validated['note']);
+            $validated['note'] = htmlspecialchars(
+                $validated['note'],
+                ENT_QUOTES,
+                'UTF-8'
+            );
         }
+
+        Expense::create([
+            'user_id'      => auth()->id(),
+            'type'         => $validated['type'],
+            'category_id'  => $validated['category_id'],
+            'amount'       => $validated['amount'],
+            'note'         => $validated['note'] ?? null,
+            'expense_date' => $validated['expense_date'],
+        ]);
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Expense saved successfully!');
     }
 
-    // Get single expense
-    public function show(Request $request, int $id)
+    // Show edit form
+    public function edit(Expense $expense)
     {
-        try {
-            $expense = Expense::forUser($request->user()->id)
-                ->with('category')
-                ->findOrFail($id);
-
-            return response()->json([
-                'success' => true,
-                'expense' => $expense,
-                'message' => 'Expense retrieved successfully.'
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Expense not found.',
-                'error'   => 'The requested expense does not exist.'
-            ], 404);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve expense.',
-                'error'   => $e->getMessage()
-            ], 500);
+        // Security: only owner can edit
+        if ($expense->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
         }
+
+        $categories = Category::active()->get();
+        return view('expenses.edit',
+            compact('expense', 'categories'));
     }
 
     // Update expense
-    public function update(Request $request, int $id)
+    public function update(Request $request, Expense $expense)
     {
-        try {
-            $expense = Expense::forUser($request->user()->id)
-                ->findOrFail($id);
-
-            $validated = $request->validate([
-                'type'         => 'sometimes|in:income,expense',
-                'category_id'  => 'sometimes|exists:categories,id',
-                'amount'       => 'sometimes|numeric|min:0.01|max:9999999',
-                'note'         => 'nullable|string|max:500',
-                'expense_date' => 'sometimes|date|before_or_equal:today',
-            ]);
-
-            $expense->update($validated);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Expense updated successfully.',
-                'expense' => $expense->fresh()->load('category'),
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Expense not found.',
-                'error'   => 'The requested expense does not exist.'
-            ], 404);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors'  => $e->errors()
-            ], 422);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update expense.',
-                'error'   => $e->getMessage()
-            ], 500);
+        // Security: only owner can update
+        if ($expense->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
         }
+
+        $validated = $request->validate([
+            'type'         => 'required|in:income,expense',
+            'category_id'  => 'required|exists:categories,id',
+            'amount'       => 'required|numeric|min:0.01|max:9999999',
+            'note'         => 'nullable|string|max:500',
+            'expense_date' => 'required|date|before_or_equal:today',
+        ]);
+
+        // Sanitize note field
+        if (isset($validated['note'])) {
+            $validated['note'] = strip_tags($validated['note']);
+            $validated['note'] = htmlspecialchars(
+                $validated['note'],
+                ENT_QUOTES,
+                'UTF-8'
+            );
+        }
+
+        $expense->update($validated);
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Expense updated successfully!');
     }
 
     // Delete expense
-    public function destroy(Request $request, int $id)
+    public function destroy(Expense $expense)
     {
-        try {
-            $expense = Expense::forUser($request->user()->id)
-                ->findOrFail($id);
-
-            $expense->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Expense deleted successfully.'
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Expense not found.',
-                'error'   => 'The requested expense does not exist.'
-            ], 404);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete expense.',
-                'error'   => $e->getMessage()
-            ], 500);
+        // Security: only owner can delete
+        if ($expense->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
         }
+
+        $expense->delete();
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Expense deleted successfully!');
     }
 }

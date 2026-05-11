@@ -23,15 +23,39 @@ class ExpenseManager extends Component
     public string $search     = '';
     public string $filterType = 'all';
 
+    // Reset pagination on search
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    // Reset pagination on filter
+    public function updatedFilterType(): void
+    {
+        $this->resetPage();
+    }
+
     // Validation rules
     protected function rules(): array
     {
         return [
             'type'         => 'required|in:income,expense',
             'category_id'  => 'required|exists:categories,id',
-            'amount'       => 'required|numeric|min:0.01',
+            'amount'       => 'required|numeric|min:0.01|max:9999999',
             'note'         => 'nullable|string|max:500',
             'expense_date' => 'required|date|before_or_equal:today',
+        ];
+    }
+
+    // Validation messages
+    protected function messages(): array
+    {
+        return [
+            'category_id.required' => 'Please select a category.',
+            'amount.min'           => 'Amount must be greater than zero.',
+            'amount.max'           => 'Amount is too large.',
+            'expense_date.before_or_equal' =>
+                'Cannot record future expenses.',
         ];
     }
 
@@ -46,28 +70,36 @@ class ExpenseManager extends Component
     {
         $this->validate();
 
+        // Sanitize note
+        $note = $this->note
+            ? strip_tags(htmlspecialchars(
+                $this->note, ENT_QUOTES, 'UTF-8'))
+            : null;
+
         $data = [
             'type'         => $this->type,
             'category_id'  => $this->category_id,
             'amount'       => $this->amount,
-            'note'         => $this->note,
+            'note'         => $note,
             'expense_date' => $this->expense_date,
         ];
 
         if ($this->editingId) {
             $expense = Expense::findOrFail($this->editingId);
 
+            // Security: only owner can edit
             if ($expense->user_id !== auth()->id()) {
                 abort(403);
             }
 
             $expense->update($data);
-            session()->flash('success', 'Expense updated!');
+            session()->flash('success', '✅ Expense updated!');
+
         } else {
             Expense::create(array_merge($data, [
                 'user_id' => auth()->id()
             ]));
-            session()->flash('success', 'Expense saved!');
+            session()->flash('success', '✅ Expense saved!');
         }
 
         $this->resetForm();
@@ -78,6 +110,7 @@ class ExpenseManager extends Component
     {
         $expense = Expense::findOrFail($id);
 
+        // Security: only owner can edit
         if ($expense->user_id !== auth()->id()) {
             abort(403);
         }
@@ -87,8 +120,12 @@ class ExpenseManager extends Component
         $this->category_id  = $expense->category_id;
         $this->amount       = $expense->amount;
         $this->note         = $expense->note ?? '';
-        $this->expense_date = $expense->expense_date->format('Y-m-d');
+        $this->expense_date = $expense->expense_date
+            ->format('Y-m-d');
         $this->showForm     = true;
+
+        // Scroll to form
+        $this->dispatch('scrollToForm');
     }
 
     // Delete expense
@@ -96,12 +133,13 @@ class ExpenseManager extends Component
     {
         $expense = Expense::findOrFail($id);
 
+        // Security: only owner can delete
         if ($expense->user_id !== auth()->id()) {
             abort(403);
         }
 
         $expense->delete();
-        session()->flash('success', 'Expense deleted!');
+        session()->flash('success', '🗑️ Expense deleted!');
     }
 
     // Reset form
@@ -109,9 +147,11 @@ class ExpenseManager extends Component
     {
         $this->reset([
             'showForm', 'editingId', 'type',
-            'category_id', 'amount', 'note', 'expense_date'
+            'category_id', 'amount', 'note',
+            'expense_date'
         ]);
         $this->type = 'expense';
+        $this->resetValidation();
     }
 
     public function render()
@@ -119,9 +159,11 @@ class ExpenseManager extends Component
         $expenses = Expense::forUser(auth()->id())
             ->with('category')
             ->when($this->search, fn($q) =>
-                $q->where('note', 'like', '%' . $this->search . '%')
+                $q->where('note', 'like',
+                    '%' . $this->search . '%')
                   ->orWhereHas('category', fn($q) =>
-                      $q->where('name', 'like', '%' . $this->search . '%')
+                      $q->where('name', 'like',
+                          '%' . $this->search . '%')
                   )
             )
             ->when($this->filterType !== 'all', fn($q) =>
