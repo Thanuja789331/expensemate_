@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CategoryManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
@@ -11,6 +12,15 @@ use App\Http\Controllers\Admin\UserManagementController;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// ── GOOGLE AUTH ROUTES ────────────────────────────────────
+Route::get('/auth/google',
+    [GoogleAuthController::class, 'redirect'])
+    ->name('auth.google');
+
+Route::get('/auth/google/callback',
+    [GoogleAuthController::class, 'callback'])
+    ->name('auth.google.callback');
 
 // ── AUTHENTICATED USER ROUTES ─────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -43,25 +53,33 @@ Route::middleware(['auth', 'verified', 'admin'])
     ->group(function () {
 
     // Admin Dashboard
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+    Route::get('/dashboard',
+        [AdminDashboardController::class, 'index'])
         ->name('dashboard');
 
     // Category Management
-    Route::get('/categories', [CategoryManagementController::class, 'index'])
+    Route::get('/categories',
+        [CategoryManagementController::class, 'index'])
         ->name('categories.index');
-    Route::post('/categories', [CategoryManagementController::class, 'store'])
+    Route::post('/categories',
+        [CategoryManagementController::class, 'store'])
         ->name('categories.store');
-    Route::put('/categories/{category}', [CategoryManagementController::class, 'update'])
+    Route::put('/categories/{category}',
+        [CategoryManagementController::class, 'update'])
         ->name('categories.update');
-    Route::delete('/categories/{category}', [CategoryManagementController::class, 'destroy'])
+    Route::delete('/categories/{category}',
+        [CategoryManagementController::class, 'destroy'])
         ->name('categories.destroy');
 
     // User Management
-    Route::get('/users', [UserManagementController::class, 'index'])
+    Route::get('/users',
+        [UserManagementController::class, 'index'])
         ->name('users.index');
-    Route::patch('/users/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
+    Route::patch('/users/{user}/toggle-active',
+        [UserManagementController::class, 'toggleActive'])
         ->name('users.toggle');
-    Route::patch('/users/{user}/change-role', [UserManagementController::class, 'changeRole'])
+    Route::patch('/users/{user}/change-role',
+        [UserManagementController::class, 'changeRole'])
         ->name('users.role');
 
 });
