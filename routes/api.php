@@ -17,9 +17,12 @@ Route::prefix('auth')->group(function () {
 // Protected API routes (token required)
 Route::middleware('auth:sanctum')->group(function () {
 
+    Route::middleware('auth:sanctum')->group(function () {
     // Auth
-    Route::post('/auth/logout', [AuthController::class, 'logout']);
-    Route::get('/auth/me',      [AuthController::class, 'me']);
+    Route::post('/auth/logout',       [AuthController::class, 'logout']);
+    Route::get('/auth/me',            [AuthController::class, 'me']);
+    Route::get('/auth/tokens',        [AuthController::class, 'tokens']);
+    Route::post('/auth/revoke-all',   [AuthController::class, 'revokeAll']);
 
     // Expenses CRUD
     Route::get('/expenses',          [ExpenseController::class, 'index']);
@@ -31,4 +34,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Summary
     Route::get('/summary', [SummaryController::class, 'index']);
 
+});
 });

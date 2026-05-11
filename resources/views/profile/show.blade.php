@@ -8,11 +8,20 @@
     <div class="bg-green-700 rounded-xl p-6 mb-6 text-white">
         <div class="flex items-center gap-4">
             {{-- Avatar --}}
-            <div class="w-20 h-20 bg-white rounded-full
-                        flex items-center justify-center flex-shrink-0">
-                <span class="text-green-700 text-3xl font-bold">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                </span>
+            <div class="w-20 h-20 rounded-full overflow-hidden
+                        flex-shrink-0 border-4 border-white">
+                @if(auth()->user()->profile_photo_path)
+                    <img src="{{ auth()->user()->profile_photo_url }}"
+                         class="w-full h-full object-cover"
+                         alt="Profile Photo"/>
+                @else
+                    <div class="w-full h-full bg-green-500
+                                flex items-center justify-center">
+                        <span class="text-white text-3xl font-bold">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </span>
+                    </div>
+                @endif
             </div>
             {{-- User Info --}}
             <div>
@@ -52,7 +61,7 @@
     <div class="bg-white rounded-xl shadow p-6 mb-6">
         <h3 class="text-lg font-bold text-gray-700 mb-4 pb-2
                    border-b border-gray-200">
-            🛡️ Two Factor Authentication (2FA)
+            🛡️ Two Factor Authentication
         </h3>
         @livewire('profile.two-factor-authentication-form')
     </div>

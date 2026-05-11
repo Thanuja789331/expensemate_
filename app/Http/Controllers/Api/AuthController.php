@@ -35,12 +35,18 @@ class AuthController extends Controller
         // Delete old tokens for this device
         $user->tokens()->where('name', $request->device_name)->delete();
 
-        // Create new token
-        $token = $user->createToken($request->device_name);
+        // Create new token with scopes and 30-day expiry
+        $token = $user->createToken(
+            $request->device_name,
+            ['expense:read', 'expense:write', 'summary:read'],
+            now()->addDays(30)
+        );
 
         return response()->json([
             'token'      => $token->plainTextToken,
             'token_type' => 'Bearer',
+            'expires_at' => now()->addDays(30)->toDateTimeString(),
+            'scopes'     => ['expense:read', 'expense:write', 'summary:read'],
             'user'       => [
                 'id'    => $user->id,
                 'name'  => $user->name,
@@ -53,6 +59,7 @@ class AuthController extends Controller
     // Logout and revoke token
     public function logout(Request $request)
     {
+        // Revoke current token only
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
@@ -64,10 +71,40 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return response()->json([
-            'id'    => $request->user()->id,
-            'name'  => $request->user()->name,
-            'email' => $request->user()->email,
-            'role'  => $request->user()->role,
+            'id'         => $request->user()->id,
+            'name'       => $request->user()->name,
+            'email'      => $request->user()->email,
+            'role'       => $request->user()->role,
+            'is_active'  => $request->user()->is_active,
+            'created_at' => $request->user()->created_at->toDateTimeString(),
         ]);
+    }
+
+    // Get all tokens for current user
+    public function tokens(Request $request)
+    {
+        $tokens = $request->user()->tokens()->get()->map(function($token) {
+            return [
+                'id'         => $token->id,
+                'name'       => $token->name,
+                'abilities'  => $token->abilities,
+                'expires_at' => $token->expires_at?->toDateTimeString(),
+                'created_at' => $token->created_at->toDateTimeString(),
+            ];
+        });
+
+        return response()->json([
+            'tokens' => $tokens
+        ], 200);
+    }
+
+    // Revoke all tokens
+    public function revokeAll(Request $request)
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'message' => 'All tokens revoked successfully.'
+        ], 200);
     }
 }

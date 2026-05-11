@@ -66,27 +66,34 @@
                         {{-- Profile Dropdown --}}
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open"
-                                    class="flex items-center gap-2 hover:text-green-300">
+                                    class="flex items-center gap-2
+                                           hover:text-green-300">
                                 <div class="w-8 h-8 bg-green-600 rounded-full
-                                            flex items-center justify-center font-bold">
+                                            flex items-center justify-center
+                                            font-bold">
                                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                                 </div>
                                 <span>{{ auth()->user()->name }}</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                <svg class="w-4 h-4" fill="none"
+                                     stroke="currentColor"
                                      viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          stroke-width="2"
+                                          d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
 
                             {{-- Dropdown Menu --}}
                             <div x-show="open"
                                  @click.away="open = false"
-                                 class="absolute right-0 mt-2 w-48 bg-white
-                                        rounded-lg shadow-lg py-2 z-50">
+                                 class="absolute right-0 mt-2 w-48
+                                        bg-white rounded-lg shadow-lg
+                                        py-2 z-50">
                                 <a href="{{ route('profile.show') }}"
                                    class="block px-4 py-2 text-gray-700
-                                          hover:bg-green-50 hover:text-green-700">
+                                          hover:bg-green-50
+                                          hover:text-green-700">
                                     👤 My Profile
                                 </a>
                                 <hr class="my-1">
@@ -118,7 +125,8 @@
                 <button id="menuBtn"
                         class="md:hidden focus:outline-none"
                         onclick="toggleMenu()">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor"
+                    <svg class="w-7 h-7" fill="none"
+                         stroke="currentColor"
                          viewBox="0 0 24 24">
                         <path id="menuIcon"
                               stroke-linecap="round"
@@ -155,18 +163,24 @@
                        class="block py-2 hover:text-green-300">
                         👤 My Profile
                     </a>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST"
+                          action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                                class="block py-2 text-red-300 hover:text-red-100">
+                                class="block py-2 text-red-300
+                                       hover:text-red-100">
                             🚪 Logout
                         </button>
                     </form>
                 @else
                     <a href="{{ route('login') }}"
-                       class="block py-2 hover:text-green-300">Login</a>
+                       class="block py-2 hover:text-green-300">
+                        Login
+                    </a>
                     <a href="{{ route('register') }}"
-                       class="block py-2 hover:text-green-300">Register</a>
+                       class="block py-2 hover:text-green-300">
+                        Register
+                    </a>
                 @endauth
             </div>
         </div>
