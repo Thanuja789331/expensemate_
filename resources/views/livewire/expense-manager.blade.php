@@ -22,17 +22,9 @@
         </select>
     </div>
 
-    {{-- Add New Button --}}
-    <button wire:click="$set('showForm', true)"
-            class="bg-green-700 text-white px-6 py-2
-                   rounded-lg mb-4 hover:bg-green-800
-                   w-full md:w-auto">
-        + Add New Entry
-    </button>
-
     {{-- Expense Form --}}
     @if($showForm)
-    <div class="bg-white border rounded-xl p-4 md:p-6 shadow mb-6">
+    <div id="expenseForm" class="bg-white border rounded-xl p-4 md:p-6 shadow mb-6">
         <h3 class="font-bold text-lg mb-4">
             {{ $editingId ? 'Update Expense' : 'New Expense Entry' }}
         </h3>
@@ -171,12 +163,11 @@
                         <th class="px-4 py-3">Type</th>
                         <th class="px-4 py-3">Amount</th>
                         <th class="px-4 py-3">Note</th>
-                        <th class="px-4 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($expenses as $expense)
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr wire:key="expense-{{ $expense->id }}" class="border-b hover:bg-gray-50">
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $expense->expense_date->format('d M Y') }}
                         </td>
@@ -201,25 +192,10 @@
                         <td class="px-4 py-3 text-gray-500">
                             {{ $expense->note ?? '---' }}
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <button
-                                wire:click="editExpense({{ $expense->id }})"
-                                class="bg-blue-500 text-white px-3 py-1
-                                       rounded text-sm mr-1">
-                                ✏️ Edit
-                            </button>
-                            <button
-                                wire:click="deleteExpense({{ $expense->id }})"
-                                wire:confirm="Delete this expense?"
-                                class="bg-red-500 text-white px-3 py-1
-                                       rounded text-sm">
-                                🗑️ Delete
-                            </button>
-                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-12">
+                        <td colspan="5" class="text-center py-12">
                             <img src="{{ asset('images/empty.svg') }}"
                                  alt="No expenses"
                                  class="w-48 h-48 mx-auto mb-4
@@ -231,7 +207,7 @@
                             <p class="text-gray-400 text-sm mb-6">
                                 Start tracking your spending today
                             </p>
-                            <button
+                            <button type="button"
                                 wire:click="$set('showForm', true)"
                                 class="bg-green-700 text-white px-8 py-3
                                        rounded-lg hover:bg-green-800

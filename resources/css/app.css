@@ -5,3 +5,113 @@
 [x-cloak] {
     display: none;
 }
+
+@layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    .dark {
+        color-scheme: dark;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-slate-50 text-slate-900 transition-colors duration-300;
+    }
+
+    input:not([type='checkbox']):not([type='radio']),
+    textarea,
+    select {
+        @apply block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-slate-900 shadow-sm placeholder:text-slate-400 transition-colors duration-300 ease-in-out focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-20;
+    }
+
+    textarea {
+        @apply min-h-[120px] resize-vertical;
+    }
+
+    select option {
+        @apply bg-white text-slate-900;
+    }
+
+    .dark body {
+        @apply bg-slate-950 text-slate-100;
+    }
+
+    .dark input:not([type='checkbox']):not([type='radio']),
+    .dark textarea,
+    .dark select {
+        @apply bg-slate-900 text-slate-100 border-slate-700 placeholder:text-slate-500;
+    }
+
+    .dark select option {
+        @apply bg-slate-900 text-slate-100;
+    }
+
+    .dark .bg-white {
+        background-color: #0f172a;
+    }
+
+    .dark .bg-gray-50,
+    .dark .bg-gray-100,
+    .dark .bg-slate-50 {
+        background-color: #111827;
+    }
+
+    .dark .border-gray-100,
+    .dark .border-gray-200,
+    .dark .border-gray-300 {
+        border-color: #334155;
+    }
+
+    .dark .text-gray-700,
+    .dark .text-gray-600,
+    .dark .text-gray-500 {
+        color: #cbd5e1;
+    }
+
+    .dark .hover\:bg-gray-50:hover {
+        background-color: #1e293b !important;
+    }
+
+    .dark .hover\:bg-gray-100:hover {
+        background-color: #1f2937 !important;
+    }
+}
+
+@layer utilities {
+    .theme-input {
+        @apply border-gray-300 bg-white text-slate-900 placeholder:text-slate-400 rounded-xl shadow-sm focus:border-green-500 focus:ring-green-500 focus:ring-2 focus:outline-none transition duration-300 ease-in-out dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500;
+    }
+
+    .theme-select {
+        @apply appearance-none border border-gray-300 bg-white text-slate-900 px-3 py-2 rounded-xl shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none focus:ring-2 transition duration-300 ease-in-out dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500;
+    }
+
+    .theme-textarea {
+        @apply border border-gray-300 bg-white text-slate-900 placeholder:text-slate-400 rounded-xl shadow-sm px-3 py-2 transition duration-300 ease-in-out focus:border-green-500 focus:ring-green-500 focus:outline-none focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500;
+    }
+
+    .theme-button {
+        @apply inline-flex items-center justify-center rounded-xl border border-transparent bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300 ease-in-out dark:bg-slate-700 dark:hover:bg-slate-600;
+    }
+
+    .theme-secondary-button {
+        @apply inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300 ease-in-out dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700;
+    }
+
+    .theme-card {
+        @apply rounded-3xl bg-white shadow-lg p-6 transition-colors duration-300 dark:bg-slate-900 dark:border-slate-700;
+    }
+
+    .theme-dropdown-content {
+        @apply py-1 bg-white dark:bg-slate-800 ring-1 ring-black/5 dark:ring-white/10;
+    }
+
+    .theme-modal {
+        @apply mb-6 rounded-3xl overflow-hidden shadow-2xl transition duration-300 ease-in-out dark:bg-slate-900;
+    }
+}

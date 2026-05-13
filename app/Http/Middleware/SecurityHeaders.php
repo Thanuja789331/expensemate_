@@ -12,7 +12,7 @@ class SecurityHeaders
 
         // Prevent clickjacking
         $response->headers->set(
-            'X-Frame-Options', 'DENY'
+            'X-Frame-Options', 'SAMEORIGIN'
         );
 
         // Prevent MIME sniffing
@@ -31,13 +31,21 @@ class SecurityHeaders
         );
 
         // Content Security Policy
+        // Allow unsafe-eval for Alpine.js and Livewire
         $response->headers->set(
             'Content-Security-Policy',
             "default-src 'self'; " .
-            "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; " .
-            "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.bunny.net; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' " .
+                "https://cdn.tailwindcss.com " .
+                "https://cdn.jsdelivr.net " .
+                "https://quickchart.io; " .
+            "style-src 'self' 'unsafe-inline' " .
+                "https://cdn.tailwindcss.com " .
+                "https://fonts.bunny.net; " .
             "font-src 'self' https://fonts.bunny.net; " .
-            "img-src 'self' data:;"
+            "img-src 'self' data: https: blob:; " .
+            "connect-src 'self' https: wss:; " .
+            "frame-src 'none';"
         );
 
         // Permissions Policy

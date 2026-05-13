@@ -10,7 +10,10 @@ use App\Http\Controllers\Admin\UserManagementController;
 
 // ── PUBLIC ROUTES ─────────────────────────────────────────
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 })->name('home');
 
 // ── GOOGLE AUTH ROUTES ────────────────────────────────────

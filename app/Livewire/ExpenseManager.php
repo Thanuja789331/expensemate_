@@ -124,8 +124,8 @@ class ExpenseManager extends Component
             ->format('Y-m-d');
         $this->showForm     = true;
 
-        // Scroll to form
-        $this->dispatch('scrollToForm');
+        // Scroll to the edit form if the browser supports the event
+        $this->dispatchBrowserEvent('scroll-to-form');
     }
 
     // Delete expense

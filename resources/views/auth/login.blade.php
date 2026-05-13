@@ -6,7 +6,7 @@
     <title>ExpenseMate — Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 overflow-x-hidden">
 
 <div class="min-h-screen flex">
 
@@ -65,27 +65,49 @@
                 </div>
             </div>
         </div>
+
+        <div class="mt-6 space-y-2 w-full max-w-sm">
+            <div class="flex flex-wrap gap-2">
+                <span class="bg-green-800 bg-opacity-50 text-green-200
+                             text-xs px-3 py-1 rounded-full border
+                             border-green-600">
+                    ✓ Secure Authentication
+                </span>
+                <span class="bg-green-800 bg-opacity-50 text-green-200
+                             text-xs px-3 py-1 rounded-full border
+                             border-green-600">
+                    ✓ Google Sign-In
+                </span>
+                <span class="bg-green-800 bg-opacity-50 text-green-200
+                             text-xs px-3 py-1 rounded-full border
+                             border-green-600">
+                    ✓ Two-Factor Security
+                </span>
+                <span class="bg-green-800 bg-opacity-50 text-green-200
+                             text-xs px-3 py-1 rounded-full border
+                             border-green-600">
+                    ✓ Smart Analytics
+                </span>
+            </div>
+        </div>
     </div>
 
     {{-- Right Side — Login Form --}}
-    <div class="w-full md:w-1/2 flex flex-col
-                justify-center items-center p-8 bg-white">
-
-        {{-- Mobile Logo --}}
-        <div class="md:hidden text-center mb-8">
-            <img src="{{ asset('images/login.svg') }}"
-                 alt="ExpenseMate"
-                 class="w-32 h-32 mx-auto mb-4" />
-            <h1 class="text-3xl font-bold text-green-700">
-                Expense<span class="text-green-500">Mate</span>
-            </h1>
-            <p class="text-gray-500">
-                Smart Spending. Simple Tracking.
-            </p>
-        </div>
-
-        {{-- Form --}}
+    <div class="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-white">
         <div class="w-full max-w-md">
+
+            {{-- Mobile Logo --}}
+            <div class="md:hidden text-center mb-8">
+                <img src="{{ asset('images/login.svg') }}"
+                     alt="ExpenseMate"
+                     class="w-32 h-32 mx-auto mb-4" />
+                <h1 class="text-3xl font-bold text-green-700">
+                    Expense<span class="text-green-500">Mate</span>
+                </h1>
+                <p class="text-gray-500">
+                    Smart Spending. Simple Tracking.
+                </p>
+            </div>
 
             <div class="mb-8">
                 <h2 class="text-3xl font-bold text-gray-800 mb-2">
@@ -96,7 +118,6 @@
                 </p>
             </div>
 
-            {{-- Session Status --}}
             @if (session('status'))
                 <div class="bg-green-100 text-green-700
                             px-4 py-3 rounded-lg mb-4">
@@ -104,7 +125,6 @@
                 </div>
             @endif
 
-            {{-- Success Message --}}
             @if (session('success'))
                 <div class="bg-green-100 text-green-700
                             px-4 py-3 rounded-lg mb-4">
@@ -177,8 +197,7 @@
                 </div>
 
                 {{-- Remember Me & Forgot Password --}}
-                <div class="flex items-center
-                            justify-between mb-6">
+                <div class="flex items-center justify-between mb-6">
                     <label class="flex items-center gap-2
                                   text-gray-600 cursor-pointer">
                         <input type="checkbox"
@@ -198,12 +217,16 @@
 
                 {{-- Login Button --}}
                 <button type="submit"
-                        class="w-full bg-green-700 text-white
-                               py-3 rounded-lg font-semibold
-                               hover:bg-green-800 transition
-                               text-lg shadow-lg
-                               shadow-green-200 mb-4">
-                    🚀 Login Now
+                        id="loginBtn"
+                        class="w-full bg-green-700 text-white py-3 rounded-lg
+                               font-semibold hover:bg-green-800 transition-all
+                               duration-300 text-lg shadow-lg shadow-green-200
+                               hover:shadow-green-300 hover:scale-[1.02] mb-4
+                               active:scale-[0.98]">
+                    <span id="btnText">🚀 Login Now</span>
+                    <span id="btnLoading" class="hidden">
+                        ⏳ Signing in...
+                    </span>
                 </button>
 
                 {{-- Divider --}}
@@ -258,8 +281,20 @@
             </form>
         </div>
     </div>
-
 </div>
 
+<footer class="fixed bottom-0 left-0 right-0
+               bg-white border-t border-gray-100
+               py-3 text-center text-gray-400 text-sm">
+    © 2026 ExpenseMate — Developed by Thanuja
+</footer>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function() {
+        document.getElementById('btnText').classList.add('hidden');
+        document.getElementById('btnLoading').classList.remove('hidden');
+        document.getElementById('loginBtn').disabled = true;
+    });
+</script>
 </body>
 </html>
