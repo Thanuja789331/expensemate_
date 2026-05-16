@@ -66,6 +66,11 @@
                            class="hover:text-green-300 transition">
                             Summary
                         </a>
+                        {{-- Budget link added --}}
+                        <a href="{{ route('budget.index') }}"
+                           class="hover:text-green-300 transition">
+                             Budget
+                        </a>
                         @if(auth()->user()->isAdmin())
                             <a href="{{ route('admin.dashboard') }}"
                                class="hover:text-green-300 transition">
@@ -160,6 +165,11 @@
                     <a href="{{ route('summary') }}"
                        class="block py-2 hover:text-green-300">
                         Summary
+                    </a>
+                    {{-- ✅ Budget link added --}}
+                    <a href="{{ route('budget.index') }}"
+                       class="block py-2 hover:text-green-300">
+                         Budget
                     </a>
                     @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.dashboard') }}"

@@ -131,4 +131,9 @@
     </div>
 </div>
 
+{{-- Livewire CategoryManager Component --}}
+<div class="mt-6">
+    <livewire:category-manager />
+</div>
+
 @endsection

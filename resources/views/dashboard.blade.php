@@ -3,7 +3,7 @@
 @section('content')
 
 {{-- Welcome Banner --}}
-<div class="relative rounded-xl overflow-hidden mb-8 h-48">
+<div class="relative rounded-xl overflow-hidden mb-6 h-48">
     <img src="{{ asset('images/banner.jpg') }}"
          alt="Dashboard Banner"
          class="w-full h-full object-cover" />
@@ -23,107 +23,9 @@
     </div>
 </div>
 
-{{-- Summary Cards --}}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-
-    {{-- Total Income --}}
-    <div class="bg-white rounded-xl shadow p-6
-                border-l-4 border-green-500
-                hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm font-medium">
-                    Total Income
-                </p>
-                <p class="text-2xl font-bold text-green-600 mt-1">
-                    ${{ number_format($totalIncome, 2) }}
-                </p>
-                <p class="text-green-500 text-xs mt-1">
-                    ↑ All time income
-                </p>
-            </div>
-            <div class="bg-green-100 p-4 rounded-full">
-                <svg class="w-8 h-8 text-green-600"
-                     fill="none" stroke="currentColor"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 4v16m8-8H4"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    {{-- Total Expense --}}
-    <div class="bg-white rounded-xl shadow p-6
-                border-l-4 border-red-500
-                hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm font-medium">
-                    Total Expense
-                </p>
-                <p class="text-2xl font-bold text-red-600 mt-1">
-                    ${{ number_format($totalExpense, 2) }}
-                </p>
-                <p class="text-red-500 text-xs mt-1">
-                    ↓ All time expense
-                </p>
-            </div>
-            <div class="bg-red-100 p-4 rounded-full">
-                <svg class="w-8 h-8 text-red-600"
-                     fill="none" stroke="currentColor"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M20 12H4"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    {{-- Balance --}}
-    <div class="bg-white rounded-xl shadow p-6
-                border-l-4 border-blue-500
-                hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm font-medium">
-                    Current Balance
-                </p>
-                <p class="text-2xl font-bold mt-1
-                    {{ $balance >= 0
-                        ? 'text-blue-600'
-                        : 'text-red-600' }}">
-                    ${{ number_format($balance, 2) }}
-                </p>
-                <p class="text-xs mt-1
-                    {{ $balance >= 0
-                        ? 'text-blue-500'
-                        : 'text-red-500' }}">
-                    {{ $balance >= 0
-                        ? '✅ Positive balance'
-                        : '⚠️ Negative balance' }}
-                </p>
-            </div>
-            <div class="bg-blue-100 p-4 rounded-full">
-                <svg class="w-8 h-8 text-blue-600"
-                     fill="none" stroke="currentColor"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M3 10h18M7 15h1m4 0h1m-7
-                             4h12a3 3 0 003-3V8a3 3 0
-                             00-3-3H6a3 3 0 00-3 3v8
-                             a3 3 0 003 3z"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-
+{{-- Livewire Dashboard Stats (live, auto-refresh 30s) --}}
+<div class="mb-6">
+    @livewire('dashboard-stats')
 </div>
 
 {{-- Quick Actions --}}

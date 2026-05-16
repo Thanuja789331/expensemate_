@@ -39,6 +39,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Expenses CRUD
     Route::resource('expenses', ExpenseController::class);
 
+    // Budget
+    Route::get('/budget', function () {
+        return view('budget.index');
+    })->name('budget.index');
+
     // 2FA Routes
     Route::get('/2fa/enable', [TwoFactorController::class, 'enable'])
         ->name('2fa.enable');
