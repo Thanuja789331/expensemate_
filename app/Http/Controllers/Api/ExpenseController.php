@@ -1,10 +1,11 @@
 <?php
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Models\Expense;
 use App\Models\Category;
-
+use App\Http\Resources\ExpenseResource;
+use App\Http\Controllers\Controller;
 class ExpenseController extends Controller
 {
     // Show all expenses
@@ -68,6 +69,7 @@ class ExpenseController extends Controller
         }
 
         $categories = Category::active()->get();
+
         return view('expenses.edit',
             compact('expense', 'categories'));
     }
@@ -116,5 +118,29 @@ class ExpenseController extends Controller
 
         return redirect()->route('dashboard')
             ->with('success', 'Expense deleted successfully!');
+    }
+
+    // API: Get all expenses
+    public function apiIndex()
+    {
+        $expenses = Expense::forUser(auth()->id())
+            ->with(['category', 'user'])
+            ->latest('expense_date')
+            ->get();
+
+        return ExpenseResource::collection($expenses);
+    }
+
+    // API: Get single expense
+    public function apiShow(Expense $expense)
+    {
+        // Security check
+        if ($expense->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $expense->load(['category', 'user']);
+
+        return new ExpenseResource($expense);
     }
 }
