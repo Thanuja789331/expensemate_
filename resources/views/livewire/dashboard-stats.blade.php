@@ -24,7 +24,7 @@
                         Total Income
                     </p>
                     <p style="font-size:20px; font-weight:700; color:#1B6B4A; margin:0;">
-                        ${{ number_format($totalIncome, 2) }}
+                        {{ currency_symbol() }}{{ number_format($totalIncome, 2) }}
                     </p>
                 </div>
                 <div style="width:36px; height:36px; border-radius:8px;
@@ -50,7 +50,7 @@
                         Total Expense
                     </p>
                     <p style="font-size:20px; font-weight:700; color:#ef4444; margin:0;">
-                        ${{ number_format($totalExpense, 2) }}
+                        {{ currency_symbol() }}{{ number_format($totalExpense, 2) }}
                     </p>
                 </div>
                 <div style="width:36px; height:36px; border-radius:8px;
@@ -77,7 +77,7 @@
                     </p>
                     <p style="font-size:20px; font-weight:700; margin:0;
                                color:{{ $balance >= 0 ? '#1B6B4A' : '#ef4444' }};">
-                        {{ $balance >= 0 ? '+' : '-' }}${{ number_format(abs($balance), 2) }}
+                        {{ $balance >= 0 ? '+' : '-' }}{{ currency_symbol() }}{{ number_format(abs($balance), 2) }}
                     </p>
                 </div>
                 <div style="width:36px; height:36px; border-radius:8px;
@@ -132,7 +132,7 @@
                 This Month Income
             </p>
             <p style="font-size:20px; font-weight:700; margin:0;">
-                ${{ number_format($monthIncome, 2) }}
+                {{ currency_symbol() }}{{ number_format($monthIncome, 2) }}
             </p>
             <p style="font-size:11px; margin:4px 0 0; opacity:0.75;">
                 {{ now()->format('F Y') }}
@@ -148,7 +148,7 @@
                 This Month Expense
             </p>
             <p style="font-size:20px; font-weight:700; margin:0;">
-                ${{ number_format($monthExpense, 2) }}
+                {{ currency_symbol() }}{{ number_format($monthExpense, 2) }}
             </p>
             <p style="font-size:11px; margin:4px 0 0; opacity:0.75;">
                 {{ now()->format('F Y') }}

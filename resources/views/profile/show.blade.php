@@ -84,7 +84,7 @@
                 <a href="{{ route('budget.index') }}"
                    style="color:white; text-decoration:none;"
                    onmouseover="this.style.color='#86efac'"
-                   onmouseout="this.style.color='white'">💰 Budget</a>
+                   onmouseout="this.style.color='white'"> Budget</a>
                 @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.dashboard') }}"
                    style="color:white; text-decoration:none;"

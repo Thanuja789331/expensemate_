@@ -166,36 +166,61 @@
                     @enderror
                 </div>
 
-                {{-- Password --}}
-                <div class="mb-4">
-                    <label class="block text-gray-600
-                                  font-medium mb-1">
-                        Password
-                    </label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3.5
-                                     text-gray-400 text-lg">
-                            🔒
-                        </span>
-                        <input type="password"
-                               name="password"
-                               required
-                               class="w-full border-2 rounded-lg
-                                      pl-10 pr-4 py-3
-                                      focus:outline-none
-                                      focus:border-green-500
-                                      @error('password')
-                                          border-red-400
-                                      @enderror"
-                               placeholder="Enter your password" />
-                    </div>
-                    @error('password')
-                        <p class="text-red-500 text-sm mt-1">
-                            {{ $message }}
-                        </p>
-                    @enderror
-                </div>
+               {{-- Password --}}
+<div class="mb-4">
+    <label class="block text-gray-600 font-medium mb-1">
+        Password
+    </label>
 
+    <div class="relative">
+        {{-- Lock icon left --}}
+        <span class="absolute left-3 top-3.5 text-gray-400 text-lg">
+            🔒
+        </span>
+
+        {{-- Password Input --}}
+        <input
+            type="password"
+            id="password-field"
+            name="password"
+            required
+            placeholder="Enter your password"
+            class="w-full border-2 rounded-lg
+                   pl-10 pr-12 py-3
+                   focus:outline-none
+                   focus:border-green-500
+                   @error('password')
+                       border-red-400
+                   @enderror"
+        />
+
+        {{-- Eye Toggle --}}
+        <button
+            type="button"
+            onclick="
+                const f = document.getElementById('password-field');
+                const e = document.getElementById('eye-icon');
+
+                if (f.type === 'password') {
+                    f.type = 'text';
+                    e.textContent = '🙈';
+                } else {
+                    f.type = 'password';
+                    e.textContent = '👁️';
+                }
+            "
+            class="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+        >
+            <span id="eye-icon">👁️</span>
+        </button>
+    </div>
+
+    @error('password')
+        <p class="text-red-500 text-sm mt-1">
+            {{ $message }}
+        </p>
+    @enderror
+</div>
                 {{-- Remember Me & Forgot Password --}}
                 <div class="flex items-center justify-between mb-6">
                     <label class="flex items-center gap-2

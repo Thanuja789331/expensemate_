@@ -1,43 +1,37 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Models\Expense;
-use App\Models\Category;
-use App\Http\Resources\ExpenseResource;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ExpenseResource;
+
 class ExpenseController extends Controller
 {
-    // Show all expenses
+    // Get all expenses
     public function index()
     {
-        $expenses = Expense::forUser(auth()->id())
-            ->with('category')
+        $expenses = Expense::with('category')
+            ->where('user_id', auth()->id())
             ->latest('expense_date')
-            ->paginate(15);
+            ->get();
 
-        return view('expenses.index', compact('expenses'));
+        return ExpenseResource::collection($expenses);
     }
 
-    // Show create form
-    public function create()
-    {
-        $categories = Category::active()->get();
-        return view('expenses.create', compact('categories'));
-    }
-
-    // Save new expense
+    // Store new expense
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'type'         => 'required|in:income,expense',
-            'category_id'  => 'required|exists:categories,id',
-            'amount'       => 'required|numeric|min:0.01|max:9999999',
-            'note'         => 'nullable|string|max:500',
+            'type' => 'required|in:income,expense',
+            'category_id' => 'required|exists:categories,id',
+            'amount' => 'required|numeric|min:0.01|max:9999999',
+            'note' => 'nullable|string|max:500',
             'expense_date' => 'required|date|before_or_equal:today',
         ]);
 
-        // Sanitize note field
+        // Sanitize note
         if (isset($validated['note'])) {
             $validated['note'] = strip_tags($validated['note']);
             $validated['note'] = htmlspecialchars(
@@ -47,50 +41,42 @@ class ExpenseController extends Controller
             );
         }
 
-        Expense::create([
-            'user_id'      => auth()->id(),
-            'type'         => $validated['type'],
-            'category_id'  => $validated['category_id'],
-            'amount'       => $validated['amount'],
-            'note'         => $validated['note'] ?? null,
-            'expense_date' => $validated['expense_date'],
+        $expense = Expense::create([
+            ...$validated,
+            'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Expense saved successfully!');
+        return response()->json([
+            'message' => 'Expense created successfully',
+            'data' => new ExpenseResource($expense)
+        ], 201);
     }
 
-    // Show edit form
-    public function edit(Expense $expense)
+    // Show single expense
+    public function show($id)
     {
-        // Security: only owner can edit
-        if ($expense->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $expense = Expense::with('category')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
 
-        $categories = Category::active()->get();
-
-        return view('expenses.edit',
-            compact('expense', 'categories'));
+        return new ExpenseResource($expense);
     }
 
     // Update expense
-    public function update(Request $request, Expense $expense)
+    public function update(Request $request, $id)
     {
-        // Security: only owner can update
-        if ($expense->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $expense = Expense::where('user_id', auth()->id())
+            ->findOrFail($id);
 
         $validated = $request->validate([
-            'type'         => 'required|in:income,expense',
-            'category_id'  => 'required|exists:categories,id',
-            'amount'       => 'required|numeric|min:0.01|max:9999999',
-            'note'         => 'nullable|string|max:500',
+            'type' => 'required|in:income,expense',
+            'category_id' => 'required|exists:categories,id',
+            'amount' => 'required|numeric|min:0.01|max:9999999',
+            'note' => 'nullable|string|max:500',
             'expense_date' => 'required|date|before_or_equal:today',
         ]);
 
-        // Sanitize note field
+        // Sanitize note
         if (isset($validated['note'])) {
             $validated['note'] = strip_tags($validated['note']);
             $validated['note'] = htmlspecialchars(
@@ -102,45 +88,22 @@ class ExpenseController extends Controller
 
         $expense->update($validated);
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Expense updated successfully!');
+        return response()->json([
+            'message' => 'Expense updated successfully',
+            'data' => new ExpenseResource($expense)
+        ]);
     }
 
     // Delete expense
-    public function destroy(Expense $expense)
+    public function destroy($id)
     {
-        // Security: only owner can delete
-        if ($expense->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $expense = Expense::where('user_id', auth()->id())
+            ->findOrFail($id);
 
         $expense->delete();
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Expense deleted successfully!');
-    }
-
-    // API: Get all expenses
-    public function apiIndex()
-    {
-        $expenses = Expense::forUser(auth()->id())
-            ->with(['category', 'user'])
-            ->latest('expense_date')
-            ->get();
-
-        return ExpenseResource::collection($expenses);
-    }
-
-    // API: Get single expense
-    public function apiShow(Expense $expense)
-    {
-        // Security check
-        if ($expense->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $expense->load(['category', 'user']);
-
-        return new ExpenseResource($expense);
+        return response()->json([
+            'message' => 'Expense deleted successfully'
+        ]);
     }
 }

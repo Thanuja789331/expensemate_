@@ -109,8 +109,28 @@
             <x-input-error for="email" class="mt-2" />
         </div>
 
-    </x-slot>
+        {{-- Currency Selector --}}
+<div class="col-span-6 sm:col-span-4">
+    <x-label for="currency" value="{{ __('Currency') }}" />
 
+    <select id="currency"
+            name="currency"
+            wire:model="state.currency"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm
+                   focus:ring-green-500 focus:border-green-500">
+
+        <option value="USD">🇺🇸 USD - US Dollar ($)</option>
+        <option value="GBP">🇬🇧 GBP - British Pound (£)</option>
+        <option value="EUR">🇪🇺 EUR - Euro (€)</option>
+        <option value="INR">🇮🇳 INR - Indian Rupee (₹)</option>
+        <option value="LKR">🇱🇰 LKR - Sri Lankan Rupee (Rs)</option>
+
+    </select>
+</div>
+
+
+
+    </x-slot>
     <x-slot name="actions">
         {{-- Saved confirmation --}}
         <x-action-message class="me-3" on="saved">

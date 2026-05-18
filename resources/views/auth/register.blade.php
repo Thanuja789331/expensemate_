@@ -164,56 +164,107 @@
                 </div>
 
                 {{-- Password --}}
-                <div class="mb-4">
-                    <label class="block text-gray-600
-                                  font-medium mb-1">
-                        Password
-                    </label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3.5
-                                     text-gray-400 text-lg">
-                            🔒
-                        </span>
-                        <input type="password"
-                               name="password"
-                               required
-                               class="w-full border-2 rounded-lg
-                                      pl-10 pr-4 py-3
-                                      focus:outline-none
-                                      focus:border-green-500
-                                      @error('password')
-                                          border-red-400
-                                      @enderror"
-                               placeholder="Create a strong password" />
-                    </div>
-                    @error('password')
-                        <p class="text-red-500 text-sm mt-1">
-                            {{ $message }}
-                        </p>
-                    @enderror
-                </div>
+<div class="mb-4">
+    <label class="block text-gray-600 font-medium mb-1">
+        Password
+    </label>
 
-                {{-- Confirm Password --}}
-                <div class="mb-6">
-                    <label class="block text-gray-600
-                                  font-medium mb-1">
-                        Confirm Password
-                    </label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3.5
-                                     text-gray-400 text-lg">
-                            🔑
-                        </span>
-                        <input type="password"
-                               name="password_confirmation"
-                               required
-                               class="w-full border-2 rounded-lg
-                                      pl-10 pr-4 py-3
-                                      focus:outline-none
-                                      focus:border-green-500"
-                               placeholder="Repeat your password" />
-                    </div>
-                </div>
+    <div class="relative">
+        {{-- Lock icon --}}
+        <span class="absolute left-3 top-3.5 text-gray-400 text-lg">
+            🔒
+        </span>
+
+        {{-- Password Input --}}
+        <input
+            type="password"
+            id="password-field"
+            name="password"
+            required
+            class="w-full border-2 rounded-lg
+                   pl-10 pr-12 py-3
+                   focus:outline-none
+                   focus:border-green-500
+                   @error('password')
+                       border-red-400
+                   @enderror"
+            placeholder="Create a strong password"
+        />
+
+        {{-- Eye Toggle --}}
+        <button
+            type="button"
+            onclick="
+                const f = document.getElementById('password-field');
+                const e = document.getElementById('eye-icon');
+
+                if (f.type === 'password') {
+                    f.type = 'text';
+                    e.textContent = '🙈';
+                } else {
+                    f.type = 'password';
+                    e.textContent = '👁️';
+                }
+            "
+            class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
+        >
+            <span id="eye-icon">👁️</span>
+        </button>
+    </div>
+
+    @error('password')
+        <p class="text-red-500 text-sm mt-1">
+            {{ $message }}
+        </p>
+    @enderror
+</div>
+
+{{-- Confirm Password --}}
+<div class="mb-6">
+    <label class="block text-gray-600 font-medium mb-1">
+        Confirm Password
+    </label>
+
+    <div class="relative">
+        {{-- Key icon --}}
+        <span class="absolute left-3 top-3.5 text-gray-400 text-lg">
+            🔑
+        </span>
+
+        {{-- Confirm Password Input --}}
+        <input
+            type="password"
+            id="confirm-password-field"
+            name="password_confirmation"
+            required
+            class="w-full border-2 rounded-lg
+                   pl-10 pr-12 py-3
+                   focus:outline-none
+                   focus:border-green-500"
+            placeholder="Repeat your password"
+        />
+
+        {{-- Eye Toggle --}}
+        <button
+            type="button"
+            onclick="
+                const f = document.getElementById('confirm-password-field');
+                const e = document.getElementById('confirm-eye-icon');
+
+                if (f.type === 'password') {
+                    f.type = 'text';
+                    e.textContent = '🙈';
+                } else {
+                    f.type = 'password';
+                    e.textContent = '👁️';
+                }
+            "
+            class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
+        >
+            <span id="confirm-eye-icon">👁️</span>
+        </button>
+    </div>
+</div>
 
                 {{-- Register Button --}}
                 <button type="submit"

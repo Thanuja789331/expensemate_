@@ -10,27 +10,47 @@ class ExpenseResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'amount' => $this->amount,
-            'formatted_amount' => $this->formatted_amount,
-            'type' => $this->type,
-            'type_label' => $this->type_label,
-            'note' => $this->note,
-            'expense_date' => $this->expense_date,
-            'formatted_date' => $this->formatted_date,
+            'id'               => $this->id,
 
-            'category' => [
-                'id' => $this->category?->id,
-                'name' => $this->category?->name,
-            ],
+            // Type
+            'type'             => $this->type,
+            'type_label'       => ucfirst($this->type),
 
-            'user' => [
-                'id' => $this->user?->id,
-                'name' => $this->user?->name,
-                'email' => $this->user?->email,
-            ],
+            // Amount
+            'amount'           => (float) $this->amount,
+            'formatted_amount' => $this->formattedAmount(),
 
-            'created_at' => $this->created_at,
+            // Details
+            'note'             => $this->note ?? '',
+            'expense_date'     => $this->expense_date
+                                    ? \Carbon\Carbon::parse($this->expense_date)->format('d M Y')
+                                    : null,
+
+            // Relationships
+            'category'         => $this->whenLoaded('category', fn() => [
+                'id'   => $this->category->id,
+                'name' => $this->category->name,
+            ]),
+
+            'user'             => $this->whenLoaded('user', fn() => [
+                'id'   => $this->user->id,
+                'name' => $this->user->name,
+            ]),
+
+            // Timestamps
+            'created_at'       => $this->created_at
+                                    ? $this->created_at->format('d M Y, h:i A')
+                                    : null,
         ];
+    }
+
+    // Helper: format amount with + or - sign
+    private function formattedAmount(): string
+    {
+        $amount = number_format((float) $this->amount, 2);
+
+        return $this->type === 'income'
+            ? "+\${$amount}"
+            : "-\${$amount}";
     }
 }

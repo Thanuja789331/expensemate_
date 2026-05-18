@@ -10,31 +10,40 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin user
-        User::updateOrCreate(
-            ['email' => 'admin@expensemate.com'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('Admin@12345'),
-                'role' => 'admin',
-                'is_active' => true,
-            ]
-        );
+        // Clear existing users first
+        User::truncate();
 
-        // Demo user
-        User::updateOrCreate(
-            ['email' => 'user@expensemate.com'],
-            [
-                'name' => 'Demo User',
-                'password' => Hash::make('User@12345'),
-                'role' => 'user',
-                'is_active' => true,
-            ]
-        );
+        // ── 1. Admin User ────────────────────────────────
+        User::create([
+            'name'       => 'Admin User',
+            'email'      => 'admin@expensemate.com',
+            'password'   => Hash::make('Admin@12345'),
+            'role'       => 'admin',
+            'is_active'  => true,
+            'currency'   => 'USD',
+            'country'    => 'US',
+            'email_verified_at' => now(),
+        ]);
 
-        // Random users
-        User::factory(10)->create();
+        // ── 2. Demo User ─────────────────────────────────
+        User::create([
+            'name'       => 'Demo User',
+            'email'      => 'user@expensemate.com',
+            'password'   => Hash::make('User@12345'),
+            'role'       => 'user',
+            'is_active'  => true,
+            'currency'   => 'USD',
+            'country'    => 'US',
+            'email_verified_at' => now(),
+        ]);
 
-        $this->command->info('✅ UserSeeder completed.');
+        // ── 3. 10 Random Users ───────────────────────────
+        User::factory(10)->create([
+            'role'      => 'user',
+            'is_active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $this->command->info('✅ UserSeeder: Admin + Demo + 10 random users created.');
     }
 }
