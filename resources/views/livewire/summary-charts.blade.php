@@ -88,7 +88,7 @@
                 Total Income
             </p>
             <p style="font-size:22px; font-weight:700; color:#1B6B4A; margin:0;">
-                ${{ number_format($totalIncome, 2) }}
+                {{ currency_symbol() }}{{ number_format($totalIncome, 2) }}
             </p>
         </div>
 
@@ -100,7 +100,7 @@
                 Total Expense
             </p>
             <p style="font-size:22px; font-weight:700; color:#ef4444; margin:0;">
-                ${{ number_format($totalExpense, 2) }}
+                {{ currency_symbol() }}{{ number_format($totalExpense, 2) }}
             </p>
         </div>
 
@@ -113,7 +113,7 @@
             </p>
             <p style="font-size:22px; font-weight:700; margin:0;
                        color:{{ $balance >= 0 ? '#1B6B4A' : '#ef4444' }};">
-                {{ $balance >= 0 ? '+' : '-' }}${{ number_format(abs($balance), 2) }}
+                {{ $balance >= 0 ? '+' : '-' }}{{ currency_symbol() }}{{ number_format(abs($balance), 2) }}
             </p>
         </div>
 
@@ -206,7 +206,7 @@
                     </td>
                     <td style="padding:12px 14px; text-align:right;
                                font-weight:600; color:#ef4444;">
-                        ${{ number_format($cat['amount'], 2) }}
+                        {{ currency_symbol() }}{{ number_format($cat['amount'], 2) }}
                     </td>
                     <td style="padding:12px 14px; text-align:right;">
                         @php $share = $grandTotal > 0
@@ -224,7 +224,7 @@
                         {{ $categoryData->sum('count') }}
                     </td>
                     <td style="padding:12px 14px; text-align:right; font-weight:700; color:#ef4444;">
-                        ${{ number_format($grandTotal, 2) }}
+                        {{ currency_symbol() }}{{ number_format($grandTotal, 2) }}
                     </td>
                     <td style="padding:12px 14px; text-align:right; color:#64748b;">100%</td>
                 </tr>
@@ -252,18 +252,15 @@
 
     {{-- Responsive CSS --}}
     <style>
-        /* Mobile first */
         .filter-grid { display:grid; grid-template-columns:1fr; gap:10px; }
         .sc-cards    { display:grid; grid-template-columns:1fr; gap:12px; }
         .sc-charts   { display:grid; grid-template-columns:1fr; gap:16px; }
 
-        /* Tablet */
         @media (min-width:600px) {
             .filter-grid { grid-template-columns:1fr 1fr; }
             .sc-cards    { grid-template-columns:repeat(3,1fr); }
         }
 
-        /* Desktop */
         @media (min-width:1024px) {
             .filter-grid { grid-template-columns:1fr 1fr 1fr auto; }
             .sc-charts   { grid-template-columns:1fr 1fr; }
@@ -273,8 +270,8 @@
     {{-- Charts --}}
     <script>
         document.addEventListener('livewire:navigated', renderCharts);
-        document.addEventListener('livewire:updated',   renderCharts);
-        document.addEventListener('DOMContentLoaded',   renderCharts);
+        document.addEventListener('livewire:updated', renderCharts);
+        document.addEventListener('DOMContentLoaded', renderCharts);
 
         function renderCharts() {
             const pieLabels  = @json($categoryData->pluck('name'));

@@ -44,7 +44,7 @@
                             ? 'text-green-600'
                             : 'text-red-600' }}">
                         {{ $expense->type === 'income' ? '+' : '-' }}
-                        ${{ number_format($expense->amount, 2) }}
+                        {{ currency_symbol() }}{{ number_format($expense->amount, 2) }}
                     </td>
                     <td class="px-4 py-3 text-gray-500">
                         {{ $expense->note ?? '---' }}
